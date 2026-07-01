@@ -600,22 +600,22 @@
   (function(){
     var sheetId = '1wtuDIPPYq0nUTI0E5WP1kl1K46C9AYRsRSsKQJfBZW4';
     var url = 'https://docs.google.com/spreadsheets/d/' + sheetId + '/gviz/tq?tqx=out:json&sheet=Sheet1&range=B2:B500';
-    fetch(url)
-      .then(function(r){ return r.text(); })
-      .then(function(text){
-        var json = JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/)[1]);
-        var rows = json.table.rows;
-        var total = 0;
-        rows.forEach(function(row){
-          if(row.c && row.c[0] && row.c[0].v){
-            total += Number(row.c[0].v);
-          }
-        });
-        document.getElementById('peopleCount').textContent = total.toLocaleString();
-      })
-      .catch(function(){
-        document.getElementById('peopleCount').textContent = '0';
+    var script = document.createElement('script');
+    window.__sheetCallback = function(json){
+      var rows = json.table.rows;
+      var total = 0;
+      rows.forEach(function(row){
+        if(row.c && row.c[0] && row.c[0].v){
+          total += Number(row.c[0].v);
+        }
       });
+      document.getElementById('peopleCount').textContent = total.toLocaleString();
+    };
+    script.src = url + '&tqx=out:json&callback=__sheetCallback';
+    script.onerror = function(){
+      document.getElementById('peopleCount').textContent = '0';
+    };
+    document.head.appendChild(script);
   })();
 </script>
 
