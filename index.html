@@ -599,18 +599,15 @@
 <script>
   (function(){
     var sheetId = '1wtuDIPPYq0nUTI0E5WP1kl1K46C9AYRsRSsKQJfBZW4';
-    var url = 'https://docs.google.com/spreadsheets/d/' + sheetId + '/gviz/tq?tqx=out:json&sheet=Sheet1&range=B2:B500';
+    var url = 'https://docs.google.com/spreadsheets/d/' + sheetId + '/export?format=csv&range=B2:B500';
     fetch(url)
       .then(function(r){ return r.text(); })
       .then(function(text){
-        var clean = text.replace(/^[^{]+/, '').replace(/[^}]+$/, '');
-        var json = JSON.parse(clean);
-        var rows = json.table.rows;
+        var lines = text.trim().split('\n');
         var total = 0;
-        rows.forEach(function(row){
-          if(row.c && row.c[0] && row.c[0].v){
-            total += Number(row.c[0].v);
-          }
+        lines.forEach(function(line){
+          var val = parseFloat(line.trim().replace(/[^0-9.]/g,''));
+          if(!isNaN(val)) total += val;
         });
         document.getElementById('peopleCount').textContent = total > 0 ? total.toLocaleString() : '0';
       })
